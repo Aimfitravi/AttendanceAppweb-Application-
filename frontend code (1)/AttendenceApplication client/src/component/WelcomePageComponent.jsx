@@ -13,7 +13,7 @@ const WelcomePageComponent = () => {
     const [loading, setLoading] = useState(true);
     const [userId, setUserId] = useState('');
     const [LoggedIn, setLoggedIn] = useState(true);
-    const [SignInSignOutData , setSignInSignOutData] = useState('')
+    const [SignInSignOutData, setSignInSignOutData] = useState('')
 
     const userName = localStorage.getItem('userName')
 
@@ -21,55 +21,55 @@ const WelcomePageComponent = () => {
     useMemo(() => {
         const userId = localStorage.getItem('userId');
         fetch(`http://localhost:8080/attendence/allAttendence/${userId}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          const convertedData = data.data.map((user) => ({
-            ...user,
-            date: convertToIndianDate(user.date),
-            singInTime: convertToIndianTime(user.singInTime),
-            signOutTime: convertToIndianTime(user.signOutTime),
-          }));
-          convertedData.forEach((obj, index) => {
-            if (obj.singInTime === 'Invalid date' && obj.signOutTime === 'Invalid date') {
-              obj.singInTime = obj.signOutTime = 'Absent';
-            }
-            if (obj.singInTime !== 'Invalid date' && obj.signOutTime === 'Invalid date') {
-              obj.signOutTime = 'pending';  
-              setSignInSignOutData('Sign Out');
-             
-            } else{
-                setSignInSignOutData('Sign In')  
-            }
-          });
-          console.log("SignInSignOutData=>"+SignInSignOutData)
-          console.log("aftewr change=>"+convertedData)
-          setUserData(convertedData);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-          setLoading(false);
-        });
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                const convertedData = data.data.map((user) => ({
+                    ...user,
+                    date: convertToIndianDate(user.date),
+                    singInTime: convertToIndianTime(user.singInTime),
+                    signOutTime: convertToIndianTime(user.signOutTime),
+                }));
+                convertedData.forEach((obj, index) => {
+                    if (obj.singInTime === 'Invalid date' && obj.signOutTime === 'Invalid date') {
+                        obj.singInTime = obj.signOutTime = 'Absent';
+                    }
+                    if (obj.singInTime !== 'Invalid date' && obj.signOutTime === 'Invalid date') {
+                        obj.signOutTime = 'pending';
+                        setSignInSignOutData('Sign Out');
 
-         if (localStorage.getItem('userId')) {
-             setUserId(localStorage.getItem('userId'));
-             
+                    } else {
+                        setSignInSignOutData('Sign In')
+                    }
+                });
+                console.log("SignInSignOutData=>" + SignInSignOutData)
+                console.log("aftewr change=>" + convertedData)
+                setUserData(convertedData);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+
+        if (localStorage.getItem('userId')) {
+            setUserId(localStorage.getItem('userId'));
+
         }
-        
-    },[SignInSignOutData])
+
+    }, [SignInSignOutData])
 
     const convertToIndianDate = (dateTimeString) => {
         return moment(dateTimeString).tz('Asia/Kolkata').format('MMMM DD, YYYY');
-      };
-    
-      const convertToIndianTime = (dateTimeString) => {
+    };
+
+    const convertToIndianTime = (dateTimeString) => {
         return moment(dateTimeString).tz('Asia/Kolkata').format('hh:mm:ss A');
-      };
+    };
 
     const handleSignOut = async () => {
         try {
@@ -82,12 +82,12 @@ const WelcomePageComponent = () => {
                     'accept': 'application/json',
                 },
             });
-            
+
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             setLoggedIn(true);
-            alert('User Signed Out');   
+            alert('User Signed Out');
         } catch (error) {
             console.error('Error during sign out:', error.message);
             toast.error('Error signing out. Please try again.');
@@ -104,31 +104,31 @@ const WelcomePageComponent = () => {
                     'accept': 'application/json',
                 },
             });
-        
+
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-              setLoggedIn(false);
+            setLoggedIn(false);
             alert('User Signed In');
-            
+
         } catch (error) {
             console.error('Error during sign in:', error.message);
-         
+
         }
     };
-   
-    const handleSignInSignOutButton = async()=>{
 
-       (SignInSignOutData === 'Sign In' ) ? handleSignIn() : handleSignOut()
-       setSignInSignOutData("Loading.");
+    const handleSignInSignOutButton = async () => {
+
+        (SignInSignOutData === 'Sign In') ? handleSignIn() : handleSignOut()
+        setSignInSignOutData("Loading.");
 
     }
 
 
     const handleViewReport = () => {
-       
+
         console.log('View Report clicked');
         navigate('/report');
     };
@@ -141,21 +141,21 @@ const WelcomePageComponent = () => {
 
     return (
         <>
-        <div className="parent-card1">
-            <div className="card1">
-                <div className="card-body">
-                <p><h3 style={{color:"blue"}}> Welcome , {userName}</h3></p> 
-                    <p>{getCurrentDateTime()[0]}</p>
-                    <p>{getCurrentDateTime()[1]}</p>
-                    <div className="buttonsWelcome">
-                        <button>
-                                <div className="signOut"  onClick={handleSignInSignOutButton}>{SignInSignOutData}</div>
-                        </button>
-                        <button onClick={handleViewReport}>View Report</button>
+            <div className="parent-card1">
+                <div className="card1">
+                    <div className="card-body">
+                        <p><h3 style={{ color: "blue" }}> Welcome , {userName}</h3></p>
+                        <p>{getCurrentDateTime()[0]}</p>
+                        <p>{getCurrentDateTime()[1]}</p>
+                        <div className="buttonsWelcome">
+                            <button>
+                                <div className="signOut" onClick={handleSignInSignOutButton}>{SignInSignOutData}</div>
+                            </button>
+                            <button onClick={handleViewReport}>View Report</button>
+                        </div>
                     </div>
                 </div>
             </div>
-</div>
         </>
     );
 };

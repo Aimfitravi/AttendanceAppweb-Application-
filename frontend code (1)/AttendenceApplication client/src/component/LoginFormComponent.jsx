@@ -64,7 +64,7 @@ const LoginFormComponent = ({ onLogin }) => {
         localStorage.setItem('LoginStatus',true)
 
         if (response.data.userRole === 'Admin') {
-          navigate('user/admin/users');
+          navigate('/admin/users');
         }else{
           navigate('/Welcome');
         }

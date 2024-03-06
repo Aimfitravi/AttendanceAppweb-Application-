@@ -43,7 +43,7 @@ function App() {
               <Routes>             
                 <Route path="/Welcome" element={<WelcomePageComponent/>}></Route>
                 <Route path="/report" element={<DisplayUserData />}></Route>
-                <Route path="user/admin/users" element={<AdminUserList />} />
+                <Route path="/admin/users" element={<AdminUserList />} />
                 <Route path="/report/:userId" element={< ShowAttendace/>} />
                 <Route path="/" element={<LoginFormComponent />}></Route>
                 <Route path="/signup" element={<RegistrationPageComponent />}></Route>

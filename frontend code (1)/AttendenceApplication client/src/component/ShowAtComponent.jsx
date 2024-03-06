@@ -25,7 +25,7 @@ const ShowAttendance = () => {
   const indexOfLastItem = activePage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = userData.slice(indexOfFirstItem, indexOfLastItem);
-  
+
 
   useEffect(() => {
     fetch(`http://localhost:8080/attendence/allAttendence/${userId}`)
@@ -60,8 +60,25 @@ const ShowAttendance = () => {
         setLoading(false);
       });
   }, []);
-    
-    
+
+  const calculateTotalHours = (startTime, endTime) => {
+    const startMoment = moment(startTime, 'hh:mm:ss A');
+    const endMoment = moment(endTime, 'hh:mm:ss A');
+
+    // Check if signOutTime is 'pending'
+    if (endTime.toLowerCase() === 'pending') {
+      return '0h 0m';
+    }
+
+    const duration = moment.duration(endMoment.diff(startMoment));
+    const hours = Math.floor(duration.asHours());
+    const minutes = Math.floor(duration.asMinutes()) % 60;
+
+    return `${hours}h ${minutes}m`;
+  };
+
+
+
   const calculateTotalForDay = (dataForDay) => {
     let totalMinutes = 0;
 
@@ -74,10 +91,10 @@ const ShowAttendance = () => {
       }
     });
 
-    const status = !isNaN(totalMinutes) ? totalMinutes < 10 ? 'Half Day' : 'Full Day' :'Absent';
+    const status = !isNaN(totalMinutes) ? totalMinutes < 10 ? 'Absent' : 'Full Day' : 'Absent';
 
-    const hours =  ! isNaN(totalMinutes) ?  Math.floor(totalMinutes / 60) : 0 ;
-    const minutes = ! isNaN(totalMinutes) ?  Math.floor(totalMinutes % 60) : 0;
+    const hours = !isNaN(totalMinutes) ? Math.floor(totalMinutes / 60) : 0;
+    const minutes = !isNaN(totalMinutes) ? Math.floor(totalMinutes % 60) : 0;
 
     return {
       totalHours: `${hours}h ${minutes}m`,
@@ -129,60 +146,67 @@ const ShowAttendance = () => {
           <h2 className="welcome-message">WELCOME , {userName}</h2>
           <h4 className="welcome-message2">( Daily Attendence List)</h4>
           <div className="user-list">
-             
-              <table>
-                <thead >
-                  <tr>
-                    <th>ID</th>
-                    <th>Date</th>
-                    <th>SignIn Time</th>
-                    <th>SignOut Time</th>
-                    <th>Total Hour's</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupedData.map((user, index) => (
-                    <React.Fragment key={index}>
-                      <tr style={{backgroundColor:"black"}}>
-                        <td style={{ color: "red" }}>{index + 1}</td>
-                        <td style={{ color: "red" }}>{user.date}</td>
-                        {/* Dummy cell for spacing */}
-                        <td colSpan="2">{/* Dummy cell for spacing */}</td>
-                        <td style={{ color: "red" }}>
-                          {user.totalHours}
+
+            <table>
+              <thead >
+                <tr>
+                  <th>ID</th>
+                  <th>Date</th>
+                  <th>SignIn Time</th>
+                  <th>SignOut Time</th>
+                  <th>Total Working Hours</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {groupedData.map((user, index) => (
+                  <React.Fragment key={index}>
+                    <tr style={{ backgroundColor: "black" }}>
+                      <td style={{ color: "red" }}>{ }</td>
+                      <td style={{ color: "red" }}>{user.date}</td>
+                      {/* Dummy cell for spacing */}
+                      <td colSpan="2">{/* Dummy cell for spacing */}</td>
+                      <td style={{ color: "red" }}>
+                        {user.totalHours}
+                      </td>
+                      <td style={{ color: "gray" }}>{user.status}</td>
+                    </tr>
+                    {user.entries.map((entry, entryIndex) => (
+                      <tr key={entryIndex}>
+                        <td>{entry.id}</td>
+                        <td>{entry.date}</td>
+                        <td>{entry.singInTime}</td>
+                        <td>{entry.signOutTime}</td>
+                        <td>
+                          {entry.signOutTime !== 'Absent' &&
+                            entry.singInTime !== 'Invalid date' &&
+                            entry.singInTime
+                            ? calculateTotalHours(entry.singInTime, entry.signOutTime)
+                            : '0h 0m '}
                         </td>
-                        <td style={{ color: "green" }}>{user.status}</td>
+
+                        <td colSpan="2">{/* Dummy cell for spacing */}</td>
                       </tr>
-                      {user.entries.map((entry, entryIndex) => (
-                        <tr key={entryIndex}>
-                          <td>{entry.id}</td>
-                          <td>{entry.date}</td>
-                          <td>{entry.singInTime}</td>
-                          <td>{entry.signOutTime}</td>
-                          
-                          <td colSpan="2">{/* Dummy cell for spacing */}</td>
-                        </tr>
-                      ))}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
-            
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+
             {userData.length > itemsPerPage && (
               <div className="pagination-container">
-              <Pagination
-                activePage={activePage}
-                itemsCountPerPage={itemsPerPage}
-                totalItemsCount={userData.length}
-                pageRangeDisplayed={5}
-                onChange={handlePageChange}
-                itemClass={`page-item ${activePage === currentPage ? 'active' : ''}`}
-                linkClass="page-link"
-              />
-               </div>
+                <Pagination
+                  activePage={activePage}
+                  itemsCountPerPage={itemsPerPage}
+                  totalItemsCount={userData.length}
+                  pageRangeDisplayed={5}
+                  onChange={handlePageChange}
+                  itemClass={`page-item ${activePage === currentPage ? 'active' : ''}`}
+                  linkClass="page-link"
+                />
+              </div>
             )}
-           
+
           </div>
         </div>
       )}

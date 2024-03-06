@@ -1,7 +1,7 @@
 /* Footer.css */
 .footerMainCss{
 position: relative;
-transform: translateY(90vh);
+transform: translateY(100vh);
 }
 .footer-container {
     background-color: #2c3e50;

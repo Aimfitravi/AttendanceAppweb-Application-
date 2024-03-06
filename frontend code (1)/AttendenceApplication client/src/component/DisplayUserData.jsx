@@ -48,6 +48,25 @@ const DisplayUserData = () => {
       });
   }, []);
 
+  const calculateTotalHours = (startTime, endTime) => {
+    const startMoment = moment(startTime, 'hh:mm:ss A');
+    const endMoment = moment(endTime, 'hh:mm:ss A');
+
+    // Check if signOutTime is 'pending'
+    if (endTime.toLowerCase() === 'pending') {
+      return '0h 0m';
+    }
+
+    const duration = moment.duration(endMoment.diff(startMoment));
+    const hours = Math.floor(duration.asHours());
+    const minutes = Math.floor(duration.asMinutes()) % 60;
+
+    return `${hours}h ${minutes}m`;
+  };
+
+
+
+
   const calculateTotalForDay = (dataForDay) => {
     let totalMinutes = 0;
 
@@ -60,10 +79,10 @@ const DisplayUserData = () => {
       }
     });
 
-    const status = !isNaN(totalMinutes) ? totalMinutes < 10 ? 'Half Day' : 'Full Day' :'Absent';
+    const status = !isNaN(totalMinutes) ? totalMinutes < 10 ? 'Absent' : 'Full Day' : 'Absent';
 
-    const hours =  ! isNaN(totalMinutes) ?  Math.floor(totalMinutes / 60) : 0 ;
-    const minutes = ! isNaN(totalMinutes) ?  Math.floor(totalMinutes % 60) : 0;
+    const hours = !isNaN(totalMinutes) ? Math.floor(totalMinutes / 60) : 0;
+    const minutes = !isNaN(totalMinutes) ? Math.floor(totalMinutes % 60) : 0;
 
     return {
       totalHours: `${hours}h ${minutes}m`,
@@ -138,8 +157,9 @@ const DisplayUserData = () => {
                 <tbody>
                   {groupedData.map((user, index) => (
                     <React.Fragment key={index}>
-                      <tr style={{backgroundColor:"black"}}>
-                        <td style={{ color: "red" }}>{index + 1}</td>
+
+                      <tr style={{ backgroundColor: "black" }}>
+                        <td style={{ color: "red" }}>{ }</td>
                         <td style={{ color: "red" }}>{user.date}</td>
                         {/* Dummy cell for spacing */}
                         <td colSpan="2">{/* Dummy cell for spacing */}</td>
@@ -154,7 +174,13 @@ const DisplayUserData = () => {
                           <td>{entry.date}</td>
                           <td>{entry.singInTime}</td>
                           <td>{entry.signOutTime}</td>
-                          
+                          <td>
+                            {entry.signOutTime !== 'Absent' &&
+                              entry.singInTime !== 'Invalid date' &&
+                              entry.singInTime
+                              ? calculateTotalHours(entry.singInTime, entry.signOutTime)
+                              : '0h 0m '}
+                          </td>
                           <td colSpan="2">{/* Dummy cell for spacing */}</td>
                         </tr>
                       ))}
